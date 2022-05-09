@@ -1,17 +1,18 @@
 import React, { useState } from "react";
 import { styled } from "@mui/material/styles";
-import { List } from "@mui/material";
+import { List, Box } from "@mui/material";
 import ListItems from "./ListItems";
+import SearchTable from "../SearchTable/SearchTable"
 
 const SearchList = styled(List)(({ theme }) => ({
     width: "100%",
-    height: "40rem",
+    height: "90vh",
     backgroundColor: "rgba(0, 0, 0, 0.3)",
     position: "relative",
     overflow: "auto",
 }));
 
-export interface ILocationInfo {
+interface ILocationInfo {
     locations: {
         location: string;
         time: string;
@@ -121,11 +122,14 @@ const Lists: React.FC = () => {
     ];
 
     return (
-        <SearchList>
-            {locations?.map((location, i) => {
-                return <ListItems key={i} location={location} />;
-            })}
-        </SearchList>
+        // <SearchList>
+        //     {locations?.map((location, i) => {
+        //         return <ListItems key={i} location={location} />;
+        //     })}
+        // </SearchList>
+        <Box sx={{ width: '100%' }}>
+            <SearchTable></SearchTable>
+        </Box>
     );
 };
 

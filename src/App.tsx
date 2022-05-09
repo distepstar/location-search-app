@@ -5,6 +5,7 @@ import { CssBaseline, Grid } from "@mui/material";
 import "./App.css";
 import Header from "./components/Header/Header";
 import Lists from "./components/Lists/Lists";
+import SearchTable from "./components/SearchTable/SearchTable";
 import Map from "./components/Map/Map";
 
 
@@ -15,7 +16,7 @@ const App: React.FC = () => {
             <Header />
             <Grid container spacing={3} style={{ width: "100%" }}>
                 <Grid item xs={12} md={5}>
-                    <Lists />
+                    <SearchTable />
                 </Grid>
                 <Grid item xs={12} md={7}>
                     <Map />
