@@ -1,7 +1,7 @@
-import React, { ElementType, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { styled, useTheme } from "@mui/material/styles" 
-import { LastPage, FirstPage, KeyboardArrowLeftSharp, KeyboardArrowRightSharp, RiceBowlSharp, Check} from "@mui/icons-material";
-import { Box, FormControlLabel, Grid, IconButton, Paper, Tab, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableFooter, TableHead, TablePagination, TableRow, Checkbox } from '@mui/material'
+import { LastPage, FirstPage, KeyboardArrowLeftSharp, KeyboardArrowRightSharp } from "@mui/icons-material";
+import { Box, FormControlLabel, IconButton, Paper, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableFooter, TableHead, TablePagination, TableRow, Checkbox } from '@mui/material'
 
 interface ILocationInfo {
     location:{
@@ -217,7 +217,7 @@ const SearchTable: React.FC = () =>{
             }
         });
 
-        if(isAllSelected[0] === true && count >= locations.length){
+        if(isAllSelected[0] === true && count >= locations.length || isAllSelected[0] === false && count >= locations.length){
             setIsAllSelected([true, true]);
         }else if(isAllSelected[0] === true && count > 0 || isAllSelected[0] === false && count > 0){
             setIsAllSelected([false, true]);
