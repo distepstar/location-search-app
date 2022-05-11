@@ -1,18 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { styled, useTheme } from "@mui/material/styles" 
-import { LastPage, FirstPage, KeyboardArrowLeftSharp, KeyboardArrowRightSharp } from "@mui/icons-material";
-import { Box, FormControlLabel, IconButton, Paper, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableFooter, TableHead, TablePagination, TableRow, Checkbox } from '@mui/material'
-
-interface ILocationInfo {
-    location:{
-        id: number;
-        selected: boolean;
-        location: string;
-        time: string;
-        postal: string;
-        geo: string;
-    },
-}
+import { LastPage, FirstPage, KeyboardArrowLeftSharp, KeyboardArrowRightSharp, LocationSearchingTwoTone } from "@mui/icons-material";
+import { Box, FormControlLabel, IconButton, Paper, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableFooter, TableHead, TablePagination, TableRow, Checkbox, Button } from '@mui/material'
+import { LocationContext } from "../../MapContext";
+import { ILocationInfo, IMarkerInfo } from "../../App";
+import { MarkerType } from "../../configurations/MapConfigure";
 
 interface IChildLocationInfo extends ILocationInfo {
     updateSelected: (id: number, event: React.ChangeEvent<HTMLInputElement>) => void
@@ -30,19 +22,6 @@ interface ILocationTablePagination{
 }
 
 // Global scope functions
-
-// For sorting order
-const descendingComparator = (<T extends unknown>(a: T, b: T, orderBy: keyof T) =>{
-    if (b[orderBy] < a[orderBy]) {
-        return -1;
-    }
-    if (b[orderBy] > a[orderBy]) {
-        return 1;
-    }
-    return 0;
-});
-
-type Order =  'asc' | 'desc';
 
 const TablePaginationActions = (props:ILocationTablePagination) => {
     const theme = useTheme();
@@ -100,19 +79,7 @@ const TablePaginationActions = (props:ILocationTablePagination) => {
 }
 
 // Data
-const createData = ((location: string, time: string, postal: string, geo: string):ILocationInfo => {
-    return {
-        location:{
-            id: 1,
-            selected: false,
-            location: location,
-            time: time,
-            postal: postal,
-            geo: geo
-        }
-    }});
-
-
+// Custom components
 
 const CustomTableCell = styled(TableCell)(({theme}) => ({
     [`&.${tableCellClasses.head}`]:{
@@ -129,7 +96,18 @@ const CustomTableCell = styled(TableCell)(({theme}) => ({
 const CustomeCheckBox = styled(Checkbox)(({theme}) => ({
     alignItems: 'center',
     color: 'rgba(230, 230, 230, 0.8)'
-}))
+}));
+
+const CustomDeleteButton = styled(Button)(({theme}) => ({
+    color: 'white',
+    border: '1px solid white',
+    width: '100px',
+    borderRadius: '4px',
+    backgroundColor: 'rgba(245, 29, 29, 0.8)',
+    "&:hover":{
+        backgroundColor: 'rgba(255, 29, 29, 0.8)',
+    }
+}));
 
 
 const SearchTableBody: React.FC<IChildLocationInfo> = ({location, updateSelected}) => {
@@ -144,61 +122,54 @@ const SearchTableBody: React.FC<IChildLocationInfo> = ({location, updateSelected
             <TableCell align="center">{location.location}</TableCell>
             <TableCell align="center">{location.time}</TableCell>
             <TableCell align="center">{location.postal}</TableCell>
-            <TableCell align="center">{location.geo}</TableCell>
+            <TableCell align="center">{`lat: ${location.geo.lat}, lng: ${location.geo.lng}`}</TableCell>
+            <TableCell align="center"></TableCell>
         </TableRow>
     )
 }
 
 
-const SearchTable: React.FC = () =>{
+interface CustomTableProps{
+    isLoading: boolean;
+    isError: boolean;
+    nearByPositions: MarkerType[] | undefined;
+}
+
+const SearchTable: React.FC<CustomTableProps> = ({isLoading, isError, nearByPositions}) =>{
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [locations, setLocations] = useState<ILocationInfo[]>([]);
     const [isAllSelected, setIsAllSelected] = useState<boolean[]>([false, false]);
-    
-    useEffect(() =>{
-        const rows: ILocationInfo[] = [
-            createData("Toronto", "12:00:00", "L5V2E2", "lat: 2.2, lnt: 3.3"),
-            createData("Toronto", "12:00:00", "L5V2E2", "lat: 2.2, lnt: 3.3"),
-            createData("Toronto", "12:00:00", "L5V2E2", "lat: 2.2, lnt: 3.3"),
-            createData("Toronto", "12:00:00", "L5V2E2", "lat: 2.2, lnt: 3.3"),
-            createData("Toronto", "12:00:00", "L5V2E2", "lat: 2.2, lnt: 3.3"),
-            createData("Toronto", "12:00:00", "L5V2E2", "lat: 2.2, lnt: 3.3"),
-            createData("Toronto", "12:00:00", "L5V2E2", "lat: 2.2, lnt: 3.3"),
-            createData("Toronto", "12:00:00", "L5V2E2", "lat: 2.2, lnt: 3.3"),
-            createData("Toronto", "12:00:00", "L5V2E2", "lat: 2.2, lnt: 3.3"),
-            createData("Toronto", "12:00:00", "L5V2E2", "lat: 2.2, lnt: 3.3"),
-            createData("Toronto", "12:00:00", "L5V2E2", "lat: 2.2, lnt: 3.3"),
-            createData("Hamilton", "12:00:00", "L5V2E2", "lat: 2.2, lnt: 3.3"),
-            createData("Toronto", "12:00:00", "L5V2E2", "lat: 2.2, lnt: 3.3"),
-            createData("Toronto", "12:00:00", "L5V2E2", "lat: 2.2, lnt: 3.3"),
-            createData("Toronto", "12:00:00", "L5V2E2", "lat: 2.2, lnt: 3.3"),
-            createData("Toronto", "12:00:00", "L5V2E2", "lat: 2.2, lnt: 3.3"),
-            createData("Toronto", "12:00:00", "L5V2E2", "lat: 2.2, lnt: 3.3"),
-            createData("Toronto", "12:00:00", "L5V2E2", "lat: 2.2, lnt: 3.3"),
-            createData("Toronto", "12:00:00", "L5V2E2", "lat: 2.2, lnt: 3.3"),
-            createData("Toronto", "12:00:00", "L5V2E2", "lat: 2.2, lnt: 3.3"),
-            createData("Toronto", "12:00:00", "L5V2E2", "lat: 2.2, lnt: 3.3"),
-            createData("Pickering", "12:00:00", "L5V2E2", "lat: 2.2, lnt: 3.3"),
-        ];
-
-        setLocations(rows.map((d, i) =>{
-            return {
-                location:{
-                    id: i,
-                    selected: d.location.selected,
-                    location: d.location.location,
-                    time: d.location.time,
-                    postal: d.location.postal,
-                    geo: d.location.geo,
-                }
-            }
-        }));
-
-    }, []);
-
-    
+    const {locations, setLocations, markerPos, setMarkerPos} = useContext(LocationContext);
     const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - locations.length) : 0
+
+    const createData = ((id: number, location: string, time: string, postal: string, geo: google.maps.LatLngLiteral):ILocationInfo => {
+        return {
+            location:{
+                id: id,
+                selected: false,
+                location: location,
+                time: time,
+                postal: postal,
+                geo: geo
+            }
+    }});
+
+    const getPosition = (originStr:string, subString:string, index:number) => {
+        return originStr.split(subString, index).join(subString).length;
+    }
+
+    const addToTable = (id: number, lat: number, lng: number, near:MarkerType) =>{
+        const postalCode = near.postal_code;
+        let address = near.address;
+        address.substring(0, getPosition(address, ',', 2));
+
+        let today = new Date();
+        let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+
+
+        let getObj = createData(id, address, time, postalCode, {lat: lat, lng: lng});
+        setLocations([...locations, getObj]);
+    }
 
     const updateSelected = ((id: number, event: React.ChangeEvent<HTMLInputElement>) : void =>{
         let checked = event.target.checked;
@@ -227,6 +198,15 @@ const SearchTable: React.FC = () =>{
 
     });
 
+    const deleteSelectedItems = ((event: React.MouseEvent<HTMLButtonElement>) =>{
+        setLocations(locations.filter(d => {
+            return d.location.selected !== true;
+        }));
+
+
+        setIsAllSelected([false, false]);
+    })
+
     const handleAllSelectedChange = ((event: React.ChangeEvent<HTMLInputElement>) => {
         let checked = event.target.checked;
         setIsAllSelected([checked, checked]);
@@ -236,7 +216,6 @@ const SearchTable: React.FC = () =>{
         }));
     })
 
-
     const handlePageChange = ((event: React.MouseEvent<HTMLButtonElement> | null, newPage: number,) =>{
         setPage(newPage)
     })
@@ -245,6 +224,28 @@ const SearchTable: React.FC = () =>{
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     })
+
+
+    useEffect(() =>{
+        let nears:MarkerType[] | undefined;
+
+        if(!isError && !isLoading){
+            nears = nearByPositions;
+            console.log(nears);
+        }
+
+        if(nears){
+            let near = nears[Math.min(0, nears.length - 1)];
+            const locationObjId = locations.length > 0 ? locations[locations.length - 1].location.id + 1 : 0;
+            const roundedLat = Number((Math.round(near.location.lat * 100) / 100).toFixed(2));
+            const roundedLng = Number((Math.round(near.location.lng * 100) / 100).toFixed(2));
+
+            addToTable(locationObjId, roundedLat, roundedLng, near);
+        }
+
+
+    }, [isLoading, isError, nearByPositions]);
+
 
     return(
         <TableContainer component={Paper} sx={{ marginLeft: 2, marginTop: 1}}>
@@ -267,6 +268,9 @@ const SearchTable: React.FC = () =>{
                         <CustomTableCell align="center"> Time </CustomTableCell>
                         <CustomTableCell align="center"> Postal Code </CustomTableCell>
                         <CustomTableCell align="center"> Geometry </CustomTableCell>
+                        <CustomTableCell align="center">
+                            <CustomDeleteButton key="locations-button-delete" onClick={e => deleteSelectedItems(e)}>Delete</CustomDeleteButton>
+                        </CustomTableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -287,7 +291,7 @@ const SearchTable: React.FC = () =>{
                     <TableRow>
                         <TablePagination
                             rowsPerPageOptions={[10, 20, 40, {label: 'All', value: -1}]}
-                            colSpan={4}
+                            colSpan={6}
                             count={locations.length}
                             rowsPerPage={rowsPerPage}
                             page={page}

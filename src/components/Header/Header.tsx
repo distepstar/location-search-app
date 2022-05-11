@@ -10,7 +10,7 @@ const commonStyle = {
     backgroundColor: "rgb(180, 176, 255)",
 };
 
-const Header: React.FC = () => {
+const Header: React.FC<any> = () => {
     return (
         <AppBar position="static">
             <Toolbar sx={{ ...commonStyle, display: "flex" }}>
@@ -42,8 +42,7 @@ const Header: React.FC = () => {
                 >
                     Location Search
                 </Typography>
-
-                <SearchBar />
+                <SearchBar/>
             </Toolbar>
         </AppBar>
     );

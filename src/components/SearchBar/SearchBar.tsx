@@ -1,8 +1,9 @@
-import React from "react";
-import { Box } from "@mui/material";
+import React, { useState } from "react";
+import {  Box, TextField } from "@mui/material";
 import { InputBase, Grid, Typography } from "@mui/material/";
 import { styled } from "@mui/material/styles";
 import SearchIcon from "@mui/icons-material/Search";
+import Autocomplete, { usePlacesWidget } from "react-google-autocomplete";
 
 const SearchBoxWrapper = styled(Box)(({ theme }) => ({
     position: "relative",
@@ -49,7 +50,7 @@ const InputBaseTras = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-const SearchBar: React.FC = () => {
+const SearchBar: React.FC<any> = () => {
     return (
         <Grid
             container
@@ -79,7 +80,7 @@ const SearchBar: React.FC = () => {
                             alignItems: "center",
                             padding: 0.8,
                         }}
-                    >
+                    > 
                         <SearchIcon sx={{ display: "inline-block" }} />
                         <InputBaseTras
                             className="location-search-input"

@@ -1,51 +1,69 @@
-import React from "react";
-import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
-import { Container, Paper, Typography, useMediaQuery } from "@mui/material";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
+import React, {useContext, useEffect } from "react";
+import { GoogleMap, Marker } from '@react-google-maps/api';
+import { LocationContext } from "../../MapContext";
+import { Box, Skeleton, } from "@mui/material";
+import { containerStyle, options, center } from "../../configurations/MapConfigure";
+import { IMarkerInfo } from "../../App";
+import AutocompleteSearch from "../Header/Test";
 
-const containerStyle = {
-    display: "inline-flex",
-    width: "100%",
-    height: "90vh",
-    borderRadius: 6,
-    margin: 10,
+
+const MapComponent : React.FC<any> = ({onLoad, onUnmount, onMapClick}) => {
+    const {locations, setLocations, markerPos, setMarkerPos} = useContext(LocationContext);
+
+    const handleMapOnClick = (event: google.maps.MapMouseEvent) => {
+        onMapClick(event);
+        const locationObjId = locations.length > 0 ? locations[locations.length - 1].location.id + 1 : 0;
+        setMarkerPos([...markerPos, {id: locationObjId, geo: {lat: event.latLng!.lat(), lng: event.latLng!.lng()}}]);
+        console.log(event.latLng!.lat(), event.latLng!.lng());
+    }
+
+    const filterMarkerList = (array:IMarkerInfo[]) => {
+        return array.filter(d=>{return locations.find((location) =>{
+            return d.id === location.location.id;
+        })});
+    }
+
+    useEffect(() =>{
+        let markerArr: IMarkerInfo[] = markerPos;
+        if(markerArr.length != locations.length){
+            markerArr = filterMarkerList(markerArr);
+            setMarkerPos(markerArr);
+        }
+    }, [locations])
+
+
+    return(
+        <Box>
+            <GoogleMap
+                mapContainerStyle={containerStyle}
+                options={options}
+                center={center}
+                zoom={12}
+                onLoad={onLoad}
+                onUnmount={onUnmount}
+                onClick={handleMapOnClick}
+            >
+
+                {markerPos.map((position)=>{
+                    return(
+                        position.geo.lat ? <Marker key={`marker_on_map_${position.id}`} position={position.geo}></Marker> : null
+                    )
+                })}
+            </GoogleMap>
+        </Box>
+    )
 };
 
-const center = { lat: -3.745, lng: -38.523 };
+const Map: React.FC<any> = ({isLoaded, onLoad, onUnmount, onMapClick}) =>{
 
-const Map: React.FC = () => {
-    const isMobile = useMediaQuery("(min-width: 600px)");
+    if(!isLoaded) return <Skeleton></Skeleton>
 
-    const { isLoaded } = useJsApiLoader({
-        id: "google-map-script",
-        googleMapsApiKey: "AIzaSyBxreAfKT8yZi0KDAxGPMyUpFhFIFf2Ea0",
-    });
+    return (
+        <Box>
+            <MapComponent onLoad={onLoad} onUnmount={onUnmount} onMapClick={onMapClick}/>
+        </Box>
+    )
+}
 
-    const [map, setMap] = React.useState(null);
+export default Map;
 
-    const onLoad = React.useCallback(function callback(map: any) {
-        const bounds = new window.google.maps.LatLngBounds(center);
-        map.fitBounds(bounds);
-        setMap(map);
-    }, []);
-
-    const onUnmount = React.useCallback(function callback(map: any) {
-        setMap(null);
-    }, []);
-
-    return isLoaded ? (
-        <GoogleMap
-            mapContainerStyle={containerStyle}
-            center={center}
-            zoom={10}
-            onLoad={onLoad}
-            onUnmount={onUnmount}
-        >
-            <></>
-        </GoogleMap>
-    ) : (
-        <></>
-    );
-};
-
-export default React.memo(Map);
