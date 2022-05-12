@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import {  Box, TextField } from "@mui/material";
+import {  Box, Button, TextField } from "@mui/material";
 import { InputBase, Grid, Typography } from "@mui/material/";
 import { styled } from "@mui/material/styles";
 import SearchIcon from "@mui/icons-material/Search";
@@ -52,14 +52,7 @@ const InputBaseTras = styled(InputBase)(({ theme }) => ({
 
 const SearchBar: React.FC<any> = () => {
     return (
-        <Grid
-            container
-            sx={{
-                justifyContent: "flex-end",
-                alignItems: "center",
-                width: "85%",
-            }}
-        >
+        <>
             <Typography
                 variant="inherit"
                 noWrap
@@ -90,7 +83,7 @@ const SearchBar: React.FC<any> = () => {
                     </Box>
                 </SearchBoxBorder>
             </SearchBoxWrapper>
-        </Grid>
+        </>
     );
 };
 

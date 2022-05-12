@@ -128,48 +128,12 @@ const SearchTableBody: React.FC<IChildLocationInfo> = ({location, updateSelected
     )
 }
 
-
-interface CustomTableProps{
-    isLoading: boolean;
-    isError: boolean;
-    nearByPositions: MarkerType[] | undefined;
-}
-
-const SearchTable: React.FC<CustomTableProps> = ({isLoading, isError, nearByPositions}) =>{
+const SearchTable: React.FC<any> = () =>{
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [isAllSelected, setIsAllSelected] = useState<boolean[]>([false, false]);
-    const {locations, setLocations, markerPos, setMarkerPos} = useContext(LocationContext);
+    const {locations, setLocations } = useContext(LocationContext);
     const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - locations.length) : 0
-
-    const createData = ((id: number, location: string, time: string, postal: string, geo: google.maps.LatLngLiteral):ILocationInfo => {
-        return {
-            location:{
-                id: id,
-                selected: false,
-                location: location,
-                time: time,
-                postal: postal,
-                geo: geo
-            }
-    }});
-
-    const getPosition = (originStr:string, subString:string, index:number) => {
-        return originStr.split(subString, index).join(subString).length;
-    }
-
-    const addToTable = (id: number, lat: number, lng: number, near:MarkerType) =>{
-        const postalCode = near.postal_code;
-        let address = near.address;
-        address.substring(0, getPosition(address, ',', 2));
-
-        let today = new Date();
-        let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-
-
-        let getObj = createData(id, address, time, postalCode, {lat: lat, lng: lng});
-        setLocations([...locations, getObj]);
-    }
 
     const updateSelected = ((id: number, event: React.ChangeEvent<HTMLInputElement>) : void =>{
         let checked = event.target.checked;
@@ -225,28 +189,6 @@ const SearchTable: React.FC<CustomTableProps> = ({isLoading, isError, nearByPosi
         setPage(0);
     })
 
-
-    useEffect(() =>{
-        let nears:MarkerType[] | undefined;
-
-        if(!isError && !isLoading){
-            nears = nearByPositions;
-            console.log(nears);
-        }
-
-        if(nears){
-            let near = nears[Math.min(0, nears.length - 1)];
-            const locationObjId = locations.length > 0 ? locations[locations.length - 1].location.id + 1 : 0;
-            const roundedLat = Number((Math.round(near.location.lat * 100) / 100).toFixed(2));
-            const roundedLng = Number((Math.round(near.location.lng * 100) / 100).toFixed(2));
-
-            addToTable(locationObjId, roundedLat, roundedLng, near);
-        }
-
-
-    }, [isLoading, isError, nearByPositions]);
-
-
     return(
         <TableContainer component={Paper} sx={{ marginLeft: 2, marginTop: 1}}>
             <Table sx={{ minWidth: 600 }} aria-label="customized table">
@@ -265,7 +207,7 @@ const SearchTable: React.FC<CustomTableProps> = ({isLoading, isError, nearByPosi
                             />
                         </CustomTableCell>
                         <CustomTableCell align="center"> Location </CustomTableCell>
-                        <CustomTableCell align="center"> Time </CustomTableCell>
+                        <CustomTableCell align="center"> Search Time </CustomTableCell>
                         <CustomTableCell align="center"> Postal Code </CustomTableCell>
                         <CustomTableCell align="center"> Geometry </CustomTableCell>
                         <CustomTableCell align="center">

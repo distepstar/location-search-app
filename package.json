@@ -17,6 +17,7 @@
     "@types/node": "^16.11.33",
     "@types/react-dom": "^18.0.3",
     "autosuggest-highlight": "^3.2.1",
+    "axios": "^0.27.2",
     "dotenv": "^16.0.0",
     "formik": "^2.2.9",
     "react": "^18.1.0",
